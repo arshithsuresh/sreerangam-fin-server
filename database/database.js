@@ -1,33 +1,46 @@
-const sqlite3 = require('sqlite3');
+const sqlite = require('better-sqlite3');
+const { query } = require('express');
 
-const db = new sqlite3.Database('./goldloan.db');
+const db = new sqlite('./database/goldloan.db');
 
-const _INIT_DATABASE_SQLITE_ = ()=>{
-
-    db.all(`CREATE TABLE IF NOT EXISTS loan_config 
+function _INIT_DATABASE_SQLITE_ () {
+    
+    db.exec(`CREATE TABLE IF NOT EXISTS loan_config 
             (
                 interest REAL NOT NULL
 
             )`)
+    
 
-    db.all(`CREATE TABLE IF NOT EXISTS userdata 
-            (   id INT NOT NULL PRIMARY KEY,
-                username VARCHAR(255) NOT NULL,
+    db.exec(`CREATE TABLE IF NOT EXISTS userdata 
+            (   id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,                
                 name VARCHAR(255) NOT NULL,
                 phone VARCHAR(12) NOT NULL,
                 address TEXT NOT NULL,
                 pincode INT(6) 
             )`);
-    
-    db.all(`CREATE TABLE IF NOT EXISTS asset_type 
+
+    db.exec(`CREATE TABLE IF NOT EXISTS login_details
             (
-                id INT NOT NULL PRIMARY KEY,
+                id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+                o_id INT NOT NULL,
+                username VARCHAR(255) NOT NULL,
+                password TEXT NOT NULL,
+                accesstoken TEXT,
+                refreshtoken TEXT,
+
+                FOREIGN KEY(o_id) REFERENCES userdata(id)
+            )`);
+    
+    db.exec(`CREATE TABLE IF NOT EXISTS asset_type 
+            (
+                id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
                 type VARCHAR(32)
             )`);
 
-    db.all(`CREATE TABLE IF NOT EXISTS assets
+    db.exec(`CREATE TABLE IF NOT EXISTS assets
             (
-                a_id INT NOT NULL PRIMARY KEY,
+                a_id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
                 o_id INT NOT NULL,
                 type INT NOT NULL,
 
@@ -38,9 +51,9 @@ const _INIT_DATABASE_SQLITE_ = ()=>{
 
             )`);    
 
-    db.all(`CREATE TABLE IF NOT EXISTS loan_details 
+    db.exec(`CREATE TABLE IF NOT EXISTS loan_details 
             (
-                loan_id INT NOT NULL PRIMARY KEY,
+                loan_id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
                 a_id INT NOT NULL,
                 o_id INT NOT NULL,
                 loan_amount REAL NOT NULL,
@@ -51,7 +64,7 @@ const _INIT_DATABASE_SQLITE_ = ()=>{
 
             )`);
 
-    db.all(`CREATE TABLE IF NOT EXISTS interest_paid 
+    db.exec(`CREATE TABLE IF NOT EXISTS interest_paid 
             (
                 l_id INT NOT NULL,        
                 interest_paid REAL NOT NULL,
@@ -62,6 +75,18 @@ const _INIT_DATABASE_SQLITE_ = ()=>{
             )`);
 }
 
+function ExecuteQuery (query, args=[]){    
+    result = db.prepare(query).run(args);    
+    return db.prepare(query).run(args);
+}
 
-_INIT_DATABASE_SQLITE_();
+function SingleQuery(query, args=[]){
+    return db.prepare(query).get(args);    
+}
 
+function MultipleQuery (query, args=[]){
+    return db.prepare(query).all(args);  
+}
+
+
+module.exports={_INIT_DATABASE_SQLITE_, SingleQuery, MultipleQuery, ExecuteQuery}
