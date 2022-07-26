@@ -1,8 +1,10 @@
 const express = require('express');
+const get_assets = require('../../database/assets/get_assets')
 const router = express.Router();
 
 router.get("/all", (req,res,next)=>{
     console.log("GET :: All Assets ")
+    get_assets.GetAllAssets();
     res.send("All assets")
 })
 

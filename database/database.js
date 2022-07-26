@@ -45,6 +45,7 @@ function _INIT_DATABASE_SQLITE_ () {
                 type INT NOT NULL,
 
                 weight_g REAL NOT NULL,
+                description TEXT,
 
                 FOREIGN KEY(type) REFERENCES asset_type(id)
                 FOREIGN KEY(o_id) REFERENCES userdata(id)  

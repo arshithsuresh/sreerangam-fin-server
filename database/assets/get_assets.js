@@ -1,7 +1,9 @@
-
+const db = require('../database')
 
 const GetAllAssets = ()=>{
     // Get all assets with name, amount, owner, date
+    const result = db.MultipleQuery("SELECT a.a_id, a.o_id, a.description, u.name, u.phone, u.address, t.type FROM assets a , userdata u , asset_type t where a.o_id=u.id and a.type=t.id LIMIT 10;")
+    console.log(result)
 }
 
 const GetAssetsOfUser = (username)=>{
