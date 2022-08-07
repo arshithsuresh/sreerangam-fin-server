@@ -10,7 +10,7 @@ router.get("/", (req,res,next)=>{
     res.json({
         alive:true
     })
-    return next()
+    return next();
 });
 
 router.use("/assets", assets_routes)
